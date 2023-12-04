@@ -32,7 +32,7 @@ def signup(request):
 			token = Token.objects.create(user=user)
 			return JsonResponse({'token':str(token)},status=201) 
 		except IntegrityError:
-			return JsonResponse(
+			return JsonResponse( \
 			{'error':'username taken. choose another username'},status=400)
 
 from django.contrib.auth import authenticate
