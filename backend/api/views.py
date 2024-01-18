@@ -32,7 +32,7 @@ class TournamentView(generics.RetrieveAPIView):
 
 from tournaments.models import UserPoints
 from .serializers import UserPointsSerializer
-from .serializers import UserPointsSerializer1
+from .serializers import ChangeUserPointsSerializer
 
 class UserPointsList(generics.ListAPIView):
 	serializer_class = UserPointsSerializer
@@ -44,29 +44,18 @@ class UserPointsList(generics.ListAPIView):
 			queryset = queryset.filter(tournament__id=int(tournament_id))
 		return queryset
 
-class UserPointsRetrieveView(generics.RetrieveAPIView):
-    serializer_class = UserPointsSerializer
+class ChangeUserPointsView(generics.RetrieveUpdateAPIView):
+    serializer_class = ChangeUserPointsSerializer
 
     def get_object(self):
-        username = self.kwargs.get('username')
-        tournament_id = self.kwargs.get('tournament_id')
-        user = get_object_or_404(User, username=username)
-        tournament = get_object_or_404(Tournament, id=tournament_id)
-        return get_object_or_404(UserPoints, user=user, tournament=tournament)
-
-class UserPointsUpdateView(generics.RetrieveUpdateAPIView):
-    queryset = UserPoints.objects.all()
-    serializer_class = UserPointsSerializer
-
-    def get_object(self):
-        username = self.kwargs.get('username')
+        queryset = UserPoints.objects.all()
+        user_id = self.kwargs.get('userId')
         tournament_id = self.kwargs.get('tournamentId')
-        user = get_object_or_404(User, username=username)
-        return get_object_or_404(UserPoints, user=user, tournament__id=tournament_id)
+        return queryset.filter(tournament__id=int(tournament_id), user__id=int(user_id)).first()
 
 class UserPointsCreateView(generics.CreateAPIView):
     queryset = UserPoints.objects.all()
-    serializer_class = UserPointsSerializer1
+    serializer_class = ChangeUserPointsSerializer
 
 from django.db import IntegrityError
 from django.contrib.auth.models import User
@@ -83,7 +72,7 @@ def signup(request):
 			user = User.objects.create_user(username=data['username'], \
 				password=data['password'])
 			token = Token.objects.create(user=user)
-			return JsonResponse({'token':str(token)}, status=201) 
+			return JsonResponse({'token':str(token), 'id': user.id}, status=201)
 		except IntegrityError:
 			return JsonResponse( \
 			{'error':'username taken. choose another username'}, status=400)
@@ -104,7 +93,7 @@ def login(request):
 				token = Token.objects.get(user=user)
 			except: 
 				token = Token.objects.create(user=user)
-			return JsonResponse({'token':str(token)}, status=201)
+			return JsonResponse({'token':str(token), 'id': user.id}, status=201)
 
 @csrf_exempt
 def change_password(request):

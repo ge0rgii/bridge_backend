@@ -16,7 +16,7 @@ class UserPoints(models.Model):
     points = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.user.username
+        return self.user.username + " " + self.tournament.name
 
 
     

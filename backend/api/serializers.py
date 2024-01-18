@@ -14,19 +14,15 @@ class TournamentSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 class UserPointsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserPoints
-        fields = ['user', 'tournament', 'deals', 'points']
-
-class UserPointsSerializer1(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all()
-    )
-    # Ensure that the tournament field is also correctly handled
-    # depending on how you want it to be represented in the request
-    tournament = serializers.PrimaryKeyRelatedField(queryset=Tournament.objects.all())
+    Username = serializers.CharField(source='user.username')
 
     class Meta:
         model = UserPoints
+        fields = ['id', 'Username', 'deals', 'points']
+
+class ChangeUserPointsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPoints
         fields = ['user', 'tournament', 'deals', 'points']
+        read_only_fields = ['user', 'tournament']
+
