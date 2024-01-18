@@ -18,3 +18,11 @@ class UserPoints(models.Model):
     def __str__(self):
         return self.user.username
 
+    def save(self, *args, **kwargs):
+        # Increment the 'deals' field by 1 each time the instance is saved
+        self.deals += 1
+        super(UserPoints, self).save(*args, **kwargs)
+
+
+    
+

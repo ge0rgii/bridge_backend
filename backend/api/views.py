@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -40,6 +41,20 @@ class UserPointsList(generics.ListAPIView):
 		if tournament_id is not None:
 			queryset = queryset.filter(tournament__id=int(tournament_id))
 		return queryset
+
+class UserPointsDetailView(generics.RetrieveUpdateAPIView):
+    queryset = UserPoints.objects.all()
+    serializer_class = UserPointsSerializer
+
+    def get_object(self):
+	    username = self.kwargs.get('username')
+	    tournament_id = self.kwargs.get('tournament_id')
+	    user = get_object_or_404(User, username=username)
+	    return get_object_or_404(UserPoints, user=user, tournament_id=tournament_id)
+
+class UserPointsCreateView(generics.CreateAPIView):
+    queryset = UserPoints.objects.all()
+    serializer_class = UserPointsSerializer
 
 from django.db import IntegrityError
 from django.contrib.auth.models import User
