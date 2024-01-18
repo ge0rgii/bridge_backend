@@ -5,6 +5,7 @@ from django.shortcuts import render
 from rest_framework import generics, permissions
 from .serializers import AccountSerializer 
 from account.models import Account
+from django.views.decorators.csrf import csrf_exempt
 class AccountListCreate(generics.ListCreateAPIView):
 	serializer_class = AccountSerializer
 	permission_classes = [permissions.IsAuthenticated]
@@ -13,6 +14,27 @@ class AccountListCreate(generics.ListCreateAPIView):
 		return Account.objects.filter(user=user)
 	def perform_create(self, serializer):
 		serializer.save(user=self.request.user)
+
+from .serializers import TournamentSerializer
+from tournaments.models import Tournament
+class TournamentList(generics.ListAPIView):
+	serializer_class = TournamentSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	def get_queryset(self):
+		return Tournament.objects.all()
+
+from tournaments.models import UserPoints
+from .serializers import UserPointsSerializer
+
+class UserPointsList(generics.ListAPIView):
+	serializer_class = UserPointsSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	def get_queryset(self):
+		queryset = UserPoints.objects.all()
+		tournament_id = self.kwargs.get('tournament_id')
+		if tournament_id is not None:
+			queryset = queryset.filter(tournament__id=int(tournament_id))
+		return queryset
 
 from django.db import IntegrityError
 from django.contrib.auth.models import User
