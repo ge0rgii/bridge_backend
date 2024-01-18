@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -31,6 +32,7 @@ class TournamentView(generics.RetrieveAPIView):
 
 from tournaments.models import UserPoints
 from .serializers import UserPointsSerializer
+from .serializers import UserPointsSerializer1
 
 class UserPointsList(generics.ListAPIView):
 	serializer_class = UserPointsSerializer
@@ -52,9 +54,21 @@ class UserPointsDetailView(generics.RetrieveUpdateAPIView):
 	    user = get_object_or_404(User, username=username)
 	    return get_object_or_404(UserPoints, user=user, tournament_id=tournament_id)
 
+    def update(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        tournament_id = kwargs.get('tournamentId')
+        user = get_object_or_404(User, username=username)
+        instance = get_object_or_404(UserPoints, user=user, tournament_id=tournament_id)
+
+        serializer = self.get_serializer(instance, data=request.data, partial=kwargs.pop('partial', False))
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
 class UserPointsCreateView(generics.CreateAPIView):
     queryset = UserPoints.objects.all()
-    serializer_class = UserPointsSerializer
+    serializer_class = UserPointsSerializer1
 
 from django.db import IntegrityError
 from django.contrib.auth.models import User

@@ -12,16 +12,11 @@ class Tournament(models.Model):
 class UserPoints(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
-    deals = models.IntegerField(default=0)
+    deals = models.IntegerField(default=1)
     points = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
-
-    def save(self, *args, **kwargs):
-        # Increment the 'deals' field by 1 each time the instance is saved
-        self.deals += 1
-        super(UserPoints, self).save(*args, **kwargs)
 
 
     
