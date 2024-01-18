@@ -26,3 +26,8 @@ class ChangeUserPointsSerializer(serializers.ModelSerializer):
         fields = ['user', 'tournament', 'deals', 'points']
         read_only_fields = ['user', 'tournament']
 
+class PostUserPointsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPoints
+        fields = ['user', 'tournament', 'deals', 'points']
+

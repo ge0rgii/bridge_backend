@@ -33,6 +33,7 @@ class TournamentView(generics.RetrieveAPIView):
 from tournaments.models import UserPoints
 from .serializers import UserPointsSerializer
 from .serializers import ChangeUserPointsSerializer
+from .serializers import PostUserPointsSerializer
 
 class UserPointsList(generics.ListAPIView):
 	serializer_class = UserPointsSerializer
@@ -53,9 +54,18 @@ class ChangeUserPointsView(generics.RetrieveUpdateAPIView):
         tournament_id = self.kwargs.get('tournamentId')
         return queryset.filter(tournament__id=int(tournament_id), user__id=int(user_id)).first()
 
-class UserPointsCreateView(generics.CreateAPIView):
-    queryset = UserPoints.objects.all()
-    serializer_class = ChangeUserPointsSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+class UserPointsCreateView(APIView):
+    def post(self, request):
+        user = User.objects.get(id=request.data['UserId'])
+        tournament = Tournament.objects.get(id=request.data['TournamentId'])
+        serializer = PostUserPointsSerializer(data={'user': request.data['UserId'], 'tournament': request.data['TournamentId'], 'deals': request.data['deals'],
+                                               'points': request.data['points']})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 from django.db import IntegrityError
 from django.contrib.auth.models import User
