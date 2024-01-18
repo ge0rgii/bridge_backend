@@ -44,27 +44,25 @@ class UserPointsList(generics.ListAPIView):
 			queryset = queryset.filter(tournament__id=int(tournament_id))
 		return queryset
 
-class UserPointsDetailView(generics.RetrieveUpdateAPIView):
+class UserPointsRetrieveView(generics.RetrieveAPIView):
+    serializer_class = UserPointsSerializer
+
+    def get_object(self):
+        username = self.kwargs.get('username')
+        tournament_id = self.kwargs.get('tournament_id')
+        user = get_object_or_404(User, username=username)
+        tournament = get_object_or_404(Tournament, id=tournament_id)
+        return get_object_or_404(UserPoints, user=user, tournament=tournament)
+
+class UserPointsUpdateView(generics.RetrieveUpdateAPIView):
     queryset = UserPoints.objects.all()
     serializer_class = UserPointsSerializer
 
     def get_object(self):
-	    username = self.kwargs.get('username')
-	    tournament_id = self.kwargs.get('tournament_id')
-	    user = get_object_or_404(User, username=username)
-	    return get_object_or_404(UserPoints, user=user, tournament_id=tournament_id)
-
-    def update(self, request, *args, **kwargs):
-        username = kwargs.get('username')
-        tournament_id = kwargs.get('tournamentId')
+        username = self.kwargs.get('username')
+        tournament_id = self.kwargs.get('tournamentId')
         user = get_object_or_404(User, username=username)
-        instance = get_object_or_404(UserPoints, user=user, tournament_id=tournament_id)
-
-        serializer = self.get_serializer(instance, data=request.data, partial=kwargs.pop('partial', False))
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        return Response(serializer.data)
+        return get_object_or_404(UserPoints, user=user, tournament__id=tournament_id)
 
 class UserPointsCreateView(generics.CreateAPIView):
     queryset = UserPoints.objects.all()

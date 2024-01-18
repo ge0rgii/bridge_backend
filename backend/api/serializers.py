@@ -14,11 +14,9 @@ class TournamentSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 class UserPointsSerializer(serializers.ModelSerializer):
-    Username = serializers.CharField(source='user.username')
-    Tournament_ID = serializers.CharField(source='tournament.id')
     class Meta:
         model = UserPoints
-        fields = ['id', 'Tournament_ID', 'Username', 'deals', 'points']
+        fields = ['user', 'tournament', 'deals', 'points']
 
 class UserPointsSerializer1(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
