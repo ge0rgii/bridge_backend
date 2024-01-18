@@ -23,6 +23,11 @@ class TournamentList(generics.ListAPIView):
 	def get_queryset(self):
 		return Tournament.objects.all()
 
+class TournamentView(generics.RetrieveAPIView):
+	permission_classes = [permissions.IsAuthenticated]
+	queryset = Tournament.objects.all()
+	serializer_class = TournamentSerializer
+
 from tournaments.models import UserPoints
 from .serializers import UserPointsSerializer
 

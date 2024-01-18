@@ -8,5 +8,6 @@ path('signup/', views.signup),
 path('login/', views.login),
 path('change-password/', views.change_password),
 path('userpoints/<int:tournament_id>/', views.UserPointsList.as_view()),
+path('tournaments/<int:pk>/', views.TournamentView.as_view()),
 
 ]
